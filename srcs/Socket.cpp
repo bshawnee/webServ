@@ -73,8 +73,7 @@ void		ft::Socket::asyncRead(ft::Buffer& buf)
 	buf.addData(tmp, n);
 	if (n < BUFSIZE)
 	{
-		EV_SET(service_->getEventTable(), *this, EVFILT_WRITE, EV_ADD | EV_ONESHOT, 0, 0, NULL);
-		kevent(service_->getKq(), service_->getEventTable(), 1, NULL, 0, NULL);
+		service_->addEvent(*this, EVFILT_WRITE);
 	}
 }
 
@@ -87,8 +86,7 @@ void		ft::Socket::asyncWrite(ft::Buffer& buf)
 	if (n == BUFSIZE)
 	{
 		buf.eraseChunk();
-		EV_SET(service_->getEventTable(), *this, EVFILT_WRITE, EV_ADD | EV_ONESHOT, 0, 0, NULL);
-		kevent(service_->getKq(), service_->getEventTable(), 1, NULL, 0, NULL);
+		service_->addEvent(*this, EVFILT_WRITE);
 	}
 	else
 	{
