@@ -33,6 +33,11 @@ ft::Socket::Socket(const t_adrress& adr, ft::IOService* io) : service_(io)
 	this->socketFd_ = socket(PF_INET, SOCK_STREAM, 0);
 	if (this->socketFd_ < 0)
 		throw ft::Socket::FailOnSocket("Can't open socket");
+	{
+		int reuse = 1;
+		if (setsockopt(this->socketFd_, SOL_SOCKET, SO_REUSEADDR, &reuse, sizeof(this->socketFd_)) < 0)
+			throw ft::Socket::FailOnSocket("Can't set socket to reusable state");
+	}
 	if ((this->info_.sin_addr.s_addr = inet_addr(adr.strAdr->c_str())) < 0)
 	{
 		::close(socketFd_);
@@ -67,14 +72,13 @@ ft::Socket::operator int()
 void		ft::Socket::asyncRead(ft::Buffer& buf)
 {
 	char* tmp = new char [BUFSIZE];
+	std::cerr << "Socket fd : " << *this << std::endl;
 	int n = recv(*this, tmp, BUFSIZE, 0);
 	// ! if (n < 0)
 	// ! return event::Error;
 	buf.addData(tmp, n);
 	if (n < BUFSIZE)
-	{
 		service_->addEvent(*this, EVFILT_WRITE);
-	}
 }
 
 void		ft::Socket::asyncWrite(ft::Buffer& buf)

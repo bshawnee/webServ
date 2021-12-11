@@ -25,11 +25,11 @@ void			ft::Acceptor::acceptConnection()
 	}
 	else if (eventTrigger.second == ft::IOService::ACCEPT_CONNECTION)
 	{
-		ft::Socket tmp(eventTrigger.first, io_);
-		EV_SET(io_->getEventTable(), tmp, EVFILT_READ, EV_ADD, 0, 0, NULL);
-		kevent(io_->getKq(), io_->getEventTable(), 1, NULL, 0, NULL);
-		servers_[tmp] = ft::Server();
-		servers_[tmp].initServer(io_, &tmp);
+		ft::Socket* tmp = new ft::Socket(eventTrigger.first, io_);
+		std::cerr << "Accepted new connection on " << *tmp << std::endl;
+		io_->addEvent(*tmp, EVFILT_READ);
+		servers_[*tmp] = ft::Server();
+		servers_[*tmp].initServer(io_, tmp);
 	}
 	else if (eventTrigger.second == ft::IOService::READ ||
 			 eventTrigger.second == ft::IOService::WRITE)
