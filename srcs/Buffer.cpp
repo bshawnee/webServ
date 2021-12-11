@@ -37,3 +37,11 @@ void	ft::Buffer::addData(char *bytes, int length) {
 ft::Buffer::t_buff*		ft::Buffer::getData() {
 	return &(*_data.begin());
 }
+
+std::string		ft::Buffer::getFullData() {
+	std::string data;
+	for (std::list<t_buff>::iterator it = _data.begin(); it != _data.end(); it++) {
+		data += it->chunk;
+	}
+	return data;
+}

@@ -1,6 +1,8 @@
 CC = clang++
 NAME = HttpServer
 SRC =	srcs/Socket.cpp \
+		srcs/IOService.cpp \
+		srcs/Server.cpp \
 		srcs/main.cpp \
 		srcs/Buffer.cpp \
 		srcs/utils.cpp \
@@ -8,6 +10,10 @@ SRC =	srcs/Socket.cpp \
 		srcs/Acceptor.cpp
 HEADERS =	includes/Socket.hpp \
 			includes/Buffer.hpp \
+			includes/Server.hpp \
+			includes/HttpRequest.hpp \
+			includes/utils.h \
+			includes/IOService.hpp \
 			includes/Acceptor.hpp
 OBJ = $(SRC:.cpp=.o)
 LDFLAGS =

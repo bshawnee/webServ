@@ -1,30 +1,26 @@
-#ifndef _SERVER_HPP
-# define _SERVER_HPP
-#include <iostream>
-#include "Acceptor.hpp"
+#ifndef SERVER_HPP
+# define SERVER_HPP
+# include "Socket.hpp"
 
-# define READ	1
-# define WRITE	2
-# define TRIGER	3
+namespace ft
+{
 
-
-class Config {
+class Server
+{
 public:
-	std::string	adr;
-	int			port;
-};
-
-class Server {
-public:
-	Server(Config* config) {
-		ft::Socket
-	}
-	int		run() {
-		ft::Socket s
-	}
+	Server();
+	Server(const Server& ref);
+	void	initServer(IOService* io, Socket* sock);
+	Server&	operator=(const Server& rhs);
+	void	run(ft::IOService::Event& event);
+	~Server();
 
 private:
-	Socket
+	IOService*	io_;
+	Socket*		socket_;
+	Buffer		buf_;
+};
+
 };
 
 #endif

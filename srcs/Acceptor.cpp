@@ -1,61 +1,53 @@
-# include "../includes/Acceptor.hpp"
-# include <map>
-ft::Acceptor::Acceptor(ft::t_config conf) : _hostSock(conf.adr, conf.port), _request() {
-	int reuse = 1;
-	try {
-		setsockopt(_hostSock, SOL_SOCKET, SO_REUSEADDR, (char*)&reuse, sizeof(int));
-		_hostSock.bindHost();
-		_hostSock.hostListen(32);
-	} catch (std::exception &e) {
-		throw ft::Acceptor::FailAccept(std::string(": cant listen"));
-	}
+#include "../includes/Acceptor.hpp"
+
+ft::Acceptor::Acceptor() {}
+
+ft::Acceptor::Acceptor(const ft::Acceptor::Hosts& hosts, ft::IOService* io) :
+io_(io), hosts_(hosts) {}
+
+ft::Acceptor::Acceptor(const ft::Acceptor& ref)
+{
+	*this = ref;
 }
 
-void 		ft::Acceptor::HandleConnection() {
-	struct kevent event;
-	struct kevent* tEvent = new struct kevent [3];
-	std::map<int, Buffer> buffered;
-	int kq = kqueue();
-	if (kq == -1)
-		throw ft::Acceptor::FailAccept("Cant init kqueue");
-	EV_SET(&event, _hostSock, EVFILT_READ, EV_ADD, 0, 0, NULL);
-	kevent(kq, &event, 1, NULL, 0, NULL);
-	while (true) {
-		int newEvents = kevent(kq, NULL, 0, tEvent, 3, NULL);
-		if (newEvents < 0)
-			break;
-		for (int i = 0; i < newEvents; i++) {
-			Socket fd(tEvent[i].ident);
-			if (tEvent[i].flags & EV_EOF) {
-				buffered.erase(fd);
-				fd.close();
-			} else if (fd == _hostSock) {
-				Socket* newSock = ft::Socket::acceptConnection(fd);
-				buffered[*newSock] = Buffer();
-				EV_SET(&event, *newSock, EVFILT_READ, EV_ADD, 0, 0, NULL);
-				kevent(kq, &event, 1, NULL, 0, NULL);
-				delete newSock;
-			} else {
-				switch (tEvent[i].filter) {
-					case EVFILT_READ:
-						fd.asyncRead(buffered[fd],
-							(t_service){ .event = &event, .kq = kq });
-						break;
-					case EVFILT_WRITE:
-						if (buffered[fd]) {
-							HttpRequest req(buffered[fd].getFullData());
-							fd.asyncWrife(buffered[fd],
-								(t_service){ .event = &event, .kq = kq });
-						}
-						break;
-					default:
-						std::cerr << "Undefined statement\n";
-						break;
-				}
-			}
-		}
+ft::Acceptor::~Acceptor() {}
+
+void			ft::Acceptor::acceptConnection()
+{
+	std::vector<int> hostsIo(hosts_.begin(), hosts_.end());
+	ft::IOService::Event eventTrigger = io_->getEvent(hostsIo);
+	std::cerr << ft::IOService::eventMsg[static_cast<int>(eventTrigger.second)] << std::endl;
+	if (eventTrigger.second == ft::IOService::CLOSE_CONNECTION)
+	{
+		std::cerr << "Connection closed\n";
+		::close(eventTrigger.first);
+		servers_.erase(eventTrigger.first);
 	}
+	else if (eventTrigger.second == ft::IOService::ACCEPT_CONNECTION)
+	{
+		ft::Socket tmp(eventTrigger.first, io_);
+		EV_SET(io_->getEventTable(), tmp, EVFILT_READ, EV_ADD, 0, 0, NULL);
+		kevent(io_->getKq(), io_->getEventTable(), 1, NULL, 0, NULL);
+		servers_[tmp] = ft::Server();
+		servers_[tmp].initServer(io_, &tmp);
+	}
+	else if (eventTrigger.second == ft::IOService::READ ||
+			 eventTrigger.second == ft::IOService::WRITE)
+	{
+		if (servers_.find(eventTrigger.first) != servers_.end())
+			servers_[eventTrigger.first].run(eventTrigger);
+		else
+			std::cerr << "Critical ERROR\n";
+	}
+	io_->incrementEvent();
 }
 
-ft::Acceptor::FailAccept::FailAccept(const std::string &e) : std::invalid_argument(
-		e + " \"" + strerror(errno) + "\"") {}
+ft::Acceptor&	ft::Acceptor::operator=(const ft::Acceptor& rhs)
+{
+	if (this == &rhs)
+		return *this;
+	io_ = rhs.io_;
+	hosts_ = rhs.hosts_;
+	servers_ = rhs.servers_;
+	return *this;
+}

@@ -1,39 +1,30 @@
-#ifndef _ACCEPTOR_HPP
-# define _ACCEPTOR_HPP
-# include "Socket.hpp"
-# include "Buffer.hpp"
-# include <iostream>
-# include "HttpRequest.hpp"
+#ifndef ACCEPTOR_HPP
+# define ACCEPTOR_HPP
+# include "Server.hpp"
+# include <map>
 
 namespace ft
 {
 
-typedef struct s_config {
-	std::string adr;
-	int			port;
-}t_config;
 
-typedef struct s_ioService {
-	struct kevent	event;
-	struct kevent	*tEvent;
-	int				kq;
-}					t_ioService;;
-
-class Acceptor {
+class Acceptor
+{
 public:
-	Acceptor(t_ioService* io);
-	~Acceptor() {};
-	Acceptor(t_config conf);
-	void HandleConnection();
-	class FailAccept : public std::invalid_argument {
-	public:
-		FailAccept(const std::string& e);
-	};
+	typedef std::vector<ft::Socket> Hosts;
+	Acceptor();
+	Acceptor(const Hosts& hosts, IOService* io);
+	Acceptor(const Acceptor& ref);
+
+	~Acceptor();
+	void		acceptConnection();
+	Acceptor&	operator=(const Acceptor& rhs);
 private:
-	Socket 		_hostSock;
-	HttpRequest	_request;
+	IOService*	io_;
+	Hosts		hosts_;
+	std::map<int, Server> servers_;
+	//TODO HANDLERS READ_WRITE
 };
 
-}
+};
 
 #endif

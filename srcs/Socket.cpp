@@ -1,80 +1,114 @@
 #include "../includes/Socket.hpp"
-#include <iostream>
-ft::Socket::Socket() : _socket(123) {}
-ft::Socket::Socket(int fd) : _socket(fd) {}
-ft::Socket::Socket(const Socket& ref) { *this = ref; }
-ft::Socket::Socket(const std::string& adr, int port) {
-	if ((_socket = socket(PF_INET, SOCK_STREAM, 0)) < 0)
-		throw ft::Socket::FailOnSocket();
-	_info.sin_addr.s_addr = inet_addr(adr.c_str());
-	_info.sin_family = PF_INET;
-	_info.sin_len = 0;
-	if (_info.sin_addr.s_addr == static_cast<in_addr_t>(-1)) {
-		::close(_socket);
-		throw ft::Socket::FailOnSocket();
-	}
-	_info.sin_port = static_cast<in_port_t>(htons(port));
-	if (fcntl(_socket, F_SETFL, O_NONBLOCK) < 0) {
-		::close(_socket);
-		throw ft::Socket::FailOnSocket();
-	}
+
+ft::Socket::Socket() : socketFd_(0), service_(NULL) {}
+
+ft::Socket::Socket(const ft::Socket& ref)
+{
+	*this = ref;
+}
+
+ft::Socket::Socket(int fd, IOService* io) : service_(io)
+{
+	sockaddr_storage info;
+	if (fd < 0)
+		throw ft::Socket::FailOnSocket("Cant create new socket");
+	int flags;
+	flags = fcntl(fd, F_GETFL, 0);
+	if (flags < 0)
+		throw ft::Socket::FailOnSocket("Failure on get flags socket");
+	if (fcntl(fd, F_SETFL, 0) < 0)
+		throw ft::Socket::FailOnSocket("Cant set connection to noneblock state");
+	if ((socketFd_ = accept(fd, reinterpret_cast<struct sockaddr*>(&info), (socklen_t*)&info)) < 0)
+		throw ft::Socket::FailOnSocket("Cant accept new connection");
+	io->addEvent(fd, EVFILT_READ);
 }
 
 ft::Socket::~Socket() {}
 
-void	ft::Socket::close() const {
-	::close(_socket);
+ft::Socket::FailOnSocket::FailOnSocket(const std::string& errorMsg) :
+	std::invalid_argument(errorMsg + ": \"" + strerror(errno) + "\"") {}
+
+ft::Socket::Socket(const t_adrress& adr, ft::IOService* io) : service_(io)
+{
+	this->socketFd_ = socket(PF_INET, SOCK_STREAM, 0);
+	if (this->socketFd_ < 0)
+		throw ft::Socket::FailOnSocket("Can't open socket");
+	if ((this->info_.sin_addr.s_addr = inet_addr(adr.strAdr->c_str())) < 0)
+	{
+		::close(socketFd_);
+		throw ft::Socket::FailOnSocket("Incorrect ipV4 adrress");
+	}
+	info_.sin_family = PF_INET;
+	info_.sin_len = 0;
+	info_.sin_port = htons(adr.port);
+	if (fcntl(socketFd_, F_SETFL, O_NONBLOCK) < 0)
+	{
+		::close(socketFd_);
+		throw ft::Socket::FailOnSocket("Cant set socket to noneblock state");
+	}
+	if (bind(socketFd_, reinterpret_cast<const sockaddr*>(&info_), sizeof(info_)) < 0)
+	{
+		::close(socketFd_);
+		throw ft::Socket::FailOnSocket("Cant bind Socket");
+	}
+	if (listen(socketFd_, LISTEN_QUEUE) < 0)
+	{
+		::close(socketFd_);
+		throw ft::Socket::FailOnSocket("Cant listen port");
+	}
+	io->addEvent(socketFd_, EVFILT_READ);
 }
 
-ft::Socket&	ft::Socket::operator=(const Socket& ref) {
-	if (this == &ref)
-		return *this;
-	::close(_socket);
-	_socket = ref._socket;
-	memcpy(&_info, &ref._info, sizeof(ref._info));
-	return *this;
+ft::Socket::operator int()
+{
+	return socketFd_;
 }
 
-ft::Socket&	ft::Socket::operator=(int fd) {
-	_socket = fd;
-	return *this;
-}
-
-ft::Socket*		ft::Socket::acceptConnection(int host) {
-	ft::Socket* t = new ft::Socket;
-	sockaddr_storage st;
-	int flags = fcntl(*t, F_GETFL, 0);
-	fcntl(*t, F_SETFL, flags | O_NONBLOCK);
-	int len = sizeof(st);
-
-	*t = accept(host, (struct sockaddr*)&st, (socklen_t*)&len);
-	if (*t < 0)
-		throw ft::Socket::FailOnSocket();
-	return t;
-}
-
-void		ft::Socket::bindHost() {
-	if (bind(_socket, (const sockaddr*)&_info, sizeof(_info)) == -1) {
-		throw ft::Socket::FailOnSocket();
+void		ft::Socket::asyncRead(ft::Buffer& buf)
+{
+	char* tmp = new char [BUFSIZE];
+	int n = recv(*this, tmp, BUFSIZE, 0);
+	// ! if (n < 0)
+	// ! return event::Error;
+	buf.addData(tmp, n);
+	if (n < BUFSIZE)
+	{
+		EV_SET(service_->getEventTable(), *this, EVFILT_WRITE, EV_ADD | EV_ONESHOT, 0, 0, NULL);
+		kevent(service_->getKq(), service_->getEventTable(), 1, NULL, 0, NULL);
 	}
 }
 
-void		ft::Socket::hostListen(unsigned queue) {
-	if (listen(_socket, queue) < 0)
-		throw ft::Socket::FailOnSocket();
+void		ft::Socket::asyncWrite(ft::Buffer& buf)
+{
+	ft::Buffer::t_buff* chunk = buf.getData();
+	int n = send(*this, chunk->chunk, chunk->length, 0);
+	// !if (n < 0)
+	//!	return event::ERROR;
+	if (n == BUFSIZE)
+	{
+		buf.eraseChunk();
+		EV_SET(service_->getEventTable(), *this, EVFILT_WRITE, EV_ADD | EV_ONESHOT, 0, 0, NULL);
+		kevent(service_->getKq(), service_->getEventTable(), 1, NULL, 0, NULL);
+	}
+	else
+	{
+		buf.clearBuffer();
+	}
+}
+
+ft::Socket&	ft::Socket::operator=(const ft::Socket& ref)
+{
+	if (this == &ref)
+		return *this;
+	this->socketFd_ = ref.socketFd_;
+	this->service_ = ref.service_;
+	return *this;
+}
+
+void		ft::Socket::close() const
+{
+	::close(socketFd_);
 }
 
 
-ft::Socket::operator int() { return _socket; }
 
-const char*	ft::Socket::FailOnSocket::what() const throw() {
-	return "Broken socket";
-}
-
-int		ft::Socket::getFd() const {
-	return this->_socket;
-}
-
-// bool	ft::operator==(const Socket& lhs, const Socket& rhs) {
-// 	return lhs.getFd() == rhs.getFd();
-// }

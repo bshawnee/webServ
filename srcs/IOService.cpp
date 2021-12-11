@@ -72,7 +72,7 @@ ft::IOService::Event		ft::IOService::getEvent(std::vector<int>& sockets)
 		return std::pair<int, ft::IOService::EventTrigger>(tEvent_[currentEvent_].ident, CLOSE_CONNECTION);
 	for (std::vector<int>::iterator hostSocket = sockets.begin(); hostSocket != sockets.end(); hostSocket++)
 	{
-		if (tEvent_[currentEvent_].ident == *hostSocket)
+		if (static_cast<int>(tEvent_[currentEvent_].ident) == *hostSocket)
 			return std::pair<int, ft::IOService::EventTrigger>(*hostSocket, ACCEPT_CONNECTION);
 	}
 	if (tEvent_[currentEvent_].filter == EVFILT_READ)
