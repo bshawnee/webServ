@@ -7,7 +7,8 @@
 # include <unistd.h>
 # include <fcntl.h>
 # include "Buffer.hpp"
-#include <iostream>
+# include "IOService.hpp"
+# include <iostream>
 namespace ft {
 
 typedef struct s_service {
@@ -31,6 +32,8 @@ public:
 	void			close() const;
 
 	void			asyncRead(ft::Buffer& buf, t_service service) {
+		if (_io.getCurrentEvent() != EVFILT_READ)
+			return ;
 		char *tmp = new char[BUFSIZE];
 		int n = recv(*this, tmp, BUFSIZE, 0);
 		std::cerr << "Bytes readed: " << n << std::endl;
@@ -45,6 +48,7 @@ public:
 
 	}
 	void			asyncWrife(ft::Buffer& buf, t_service service) {
+
 		ft::Buffer::t_buff* chunk = buf.getData();
 
 		int n = send(*this, chunk->chunk, chunk->length, 0);
@@ -68,6 +72,7 @@ public:
 protected:
 	int			_socket;
 	sockaddr_in	_info;
+	IOService&	_io;
 };
 
 // bool	operator==(const Socket& lhs, const Socket& rhs);

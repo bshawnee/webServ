@@ -3,6 +3,8 @@ NAME = HttpServer
 SRC =	srcs/Socket.cpp \
 		srcs/main.cpp \
 		srcs/Buffer.cpp \
+		srcs/utils.cpp \
+		srcs/HttpRequest.cpp \
 		srcs/Acceptor.cpp
 HEADERS =	includes/Socket.hpp \
 			includes/Buffer.hpp \
