@@ -13,10 +13,11 @@ public:
 		size_t	length;
 	}			t_buff;
 	Buffer();
-	// TODO добавить хренатень
+	Buffer(const ft::Buffer& ref);
 	~Buffer();
 
 	operator bool();
+	ft::Buffer&		operator=(const ft::Buffer& rhs);
 	std::string		getFullData();
 	void			addData(char *bytes, int length);
 	t_buff*			getData();
@@ -25,6 +26,8 @@ public:
 private:
 	std::list<t_buff>	_data;
 };
+
+typedef ft::Buffer (*Handler)(ft::Buffer&);
 
 };
 

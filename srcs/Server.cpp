@@ -22,17 +22,10 @@ void		ft::Server::initServer(ft::IOService* io, ft::Socket* sock)
 
 void		ft::Server::run(ft::IOService::Event& event)
 {
-	HttpRequest* req = NULL;
 	if (event.second == ft::IOService::READ)
-	{
 		socket_->asyncRead(buf_);
-		if (buf_)
-			req = new HttpRequest(buf_.getFullData());
-	}
 	if (event.second == ft::IOService::WRITE)
 		socket_->asyncWrite(buf_);
-	if (req)
-		delete req;
 }
 
 ft::Server&	ft::Server::operator=(const Server& rhs)

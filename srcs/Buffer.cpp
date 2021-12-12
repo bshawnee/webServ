@@ -8,6 +8,25 @@ ft::Buffer::~Buffer() {
 	}
 }
 
+ft::Buffer::Buffer(const ft::Buffer& ref)
+{
+	*this = ref;
+}
+
+ft::Buffer&	ft::Buffer::operator=(const ft::Buffer& rhs)
+{
+	if (this == &rhs)
+		return *this;
+	this->clearBuffer();
+	for (std::list<t_buff>::const_iterator it = rhs._data.begin(); it != rhs._data.end(); it++)
+	{
+		char* tmp = new char [BUFSIZE];
+		strcpy(tmp, it->chunk);
+		this->_data.push_back({.chunk = tmp, .length = it->length});
+	}
+	return *this;
+}
+
 ft::Buffer::operator bool() {
 	if (_data.begin()->length != BUFSIZE)
 		return true;

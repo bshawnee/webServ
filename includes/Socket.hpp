@@ -39,8 +39,8 @@ public:
 	Socket(const Socket& ref);
 
 	Socket&	operator=(const Socket& ref);
-	void	asyncRead(ft::Buffer& buf);
-	void	asyncWrite(ft::Buffer& buf);
+	void	asyncRead(ft::Buffer& buf, ft::Handler);
+	void	asyncWrite(ft::Buffer& buf, ft::Handler);
 	void	close() const;
 	class FailOnSocket : public std::invalid_argument
 	{
