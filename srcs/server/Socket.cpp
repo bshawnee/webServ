@@ -1,4 +1,4 @@
-#include "../includes/Socket.hpp"
+#include "../../includes/server/Socket.hpp"
 
 ft::Socket::Socket() : socketFd_(0), service_(NULL) {}
 
@@ -69,7 +69,7 @@ ft::Socket::operator int()
 	return socketFd_;
 }
 
-void		ft::Socket::asyncRead(ft::Buffer& buf, ft::Handler handle)
+void		ft::Socket::asyncRead(ft::Buffer& buf)
 {
 	char* tmp = new char [BUFSIZE];
 	std::cerr << "Socket fd : " << *this << std::endl;
@@ -79,13 +79,12 @@ void		ft::Socket::asyncRead(ft::Buffer& buf, ft::Handler handle)
 	buf.addData(tmp, n);
 	if (n < BUFSIZE)
 	{
-		buf = handle(buf);
 		service_->addEvent(*this, EVFILT_WRITE);
 	}
 
 }
 
-void		ft::Socket::asyncWrite(ft::Buffer& buf, ft::Handler handle = NULL)
+void		ft::Socket::asyncWrite(ft::Buffer& buf)
 {
 	ft::Buffer::t_buff* chunk = buf.getData();
 	int n = send(*this, chunk->chunk, chunk->length, 0);
@@ -98,8 +97,6 @@ void		ft::Socket::asyncWrite(ft::Buffer& buf, ft::Handler handle = NULL)
 	}
 	else
 	{
-		if (handle != NULL)
-			buf = handle(buf);
 		buf.clearBuffer();
 	}
 }

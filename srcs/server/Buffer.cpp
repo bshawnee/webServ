@@ -1,4 +1,4 @@
-#include "../includes/Buffer.hpp"
+#include "../../includes/server/Buffer.hpp"
 
 ft::Buffer::Buffer() {}
 
@@ -22,7 +22,8 @@ ft::Buffer&	ft::Buffer::operator=(const ft::Buffer& rhs)
 	{
 		char* tmp = new char [BUFSIZE];
 		strcpy(tmp, it->chunk);
-		this->_data.push_back({.chunk = tmp, .length = it->length});
+		t_buff t = {.chunk = tmp, .length = it->length};
+		this->_data.push_back(t);
 	}
 	return *this;
 }

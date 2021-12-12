@@ -1,6 +1,6 @@
-#include "../includes/Server.hpp"
+#include "../../includes/server/Server.hpp"
 
-static const std::string page = "<!doctype html><html><head><title>Our Funky HTML Page</title><meta name=\"description\" content=\"Our first page\"><meta name=\"keywords\" content=\"html tutorial template\"></head><body>Content goes here.</body></html>";
+static const std::string page = "";
 
 ft::Server::Server() {}
 

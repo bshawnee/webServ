@@ -1,20 +1,22 @@
 CC = clang++
 NAME = HttpServer
-SRC =	srcs/Socket.cpp \
-		srcs/IOService.cpp \
-		srcs/Server.cpp \
+SERV_PREF = srcs/server/
+HAND_PREF = srcs/handlers/
+SRC =	$(SERV_PREF)Socket.cpp \
+		$(SERV_PREF)IOService.cpp \
+		$(SERV_PREF)Server.cpp \
 		srcs/main.cpp \
-		srcs/Buffer.cpp \
+		$(SERV_PREF)Buffer.cpp \
 		srcs/utils.cpp \
-		srcs/HttpRequest.cpp \
-		srcs/Acceptor.cpp
-HEADERS =	includes/Socket.hpp \
-			includes/Buffer.hpp \
-			includes/Server.hpp \
-			includes/HttpRequest.hpp \
+		$(HAND_PREF)HttpRequest.cpp \
+		$(SERV_PREF)Acceptor.cpp
+HEADERS =	includes/server/Socket.hpp \
+			includes/server/Buffer.hpp \
+			includes/server/Server.hpp \
+			includes/handlers/HttpRequest.hpp \
 			includes/utils.h \
-			includes/IOService.hpp \
-			includes/Acceptor.hpp
+			includes/server/IOService.hpp \
+			includes/server/Acceptor.hpp
 OBJ = $(SRC:.cpp=.o)
 LDFLAGS =
 FLAGS = -c -Wall -Wextra -Werror -std=c++98 -g

@@ -2,7 +2,7 @@
 # define BUFFER_HPP
 # include <list>
 # include <string>
-# define BUFSIZE 10
+# define BUFSIZE 1024
 namespace ft
 {
 

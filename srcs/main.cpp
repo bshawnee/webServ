@@ -1,5 +1,5 @@
-#include "../includes/Server.hpp"
-# include "../includes/Acceptor.hpp"
+#include "../includes/server/Server.hpp"
+# include "../includes/server/Acceptor.hpp"
 int		main()
 {
 	std::string localhost= "127.0.0.1";
