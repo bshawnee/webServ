@@ -8,6 +8,7 @@
 # include "IOService.hpp"
 # include <iostream>
 # include "Buffer.hpp"
+# include "../handlers/ResponseFactory.h"
 
 # define	LISTEN_QUEUE	32
 

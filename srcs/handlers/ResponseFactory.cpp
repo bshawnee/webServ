@@ -1,6 +1,6 @@
 #include "../../includes/handlers/ResponseFactory.h"
 
-const std::string ft::Response::availableMethod[AVAILABLE_METHOD_COUNT] = {
+const static std::string g_availableMethod[AVAILABLE_METHOD_COUNT] = {
 	"GET",
 	"POST",
 	"PUT"
@@ -14,15 +14,17 @@ static ft::response::AResponse*	getGetResponse(HttpRequest& req)
 
 static ft::response::AResponse*	getPostResponse(HttpRequest& req)
 {
+	req.getUrl();
 	return NULL;
 }
 
 static ft::response::AResponse*	getPutResponse(HttpRequest& req)
 {
+	req.getUrl();
 	return NULL;
 }
 
-ft::response::AResponse*	ft::Response::accept(HttpRequest& req)
+ft::response::AResponse*	ft::response::accept(HttpRequest& req)
 {
 	methodFunc func[AVAILABLE_METHOD_COUNT] = {
 		getGetResponse,
@@ -32,7 +34,7 @@ ft::response::AResponse*	ft::Response::accept(HttpRequest& req)
 	};
 	size_t i;
 	for (i = 0; i < AVAILABLE_METHOD_COUNT; i++)
-		if (!availableMethod[i].compare(req.getHttpMethod()))
+		if (!g_availableMethod[i].compare(req.getHttpMethod()))
 			break ;
 	return func[i](req);
 }
@@ -40,7 +42,7 @@ ft::response::AResponse*	ft::Response::accept(HttpRequest& req)
 ft::Buffer	handle(ft::Buffer& b)
 {
 	HttpRequest req(b.getFullData());
-	ft::response::AResponse* res = ft::Response::accept(req);
+	ft::response::AResponse* res = ft::response::accept(req);
 	ft::Buffer buf = res->getRespone();
 	delete res;
 	return buf;

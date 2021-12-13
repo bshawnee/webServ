@@ -79,6 +79,14 @@ void		ft::Socket::asyncRead(ft::Buffer& buf)
 	buf.addData(tmp, n);
 	if (n < BUFSIZE)
 	{
+		HttpRequest req(buf.getFullData());
+		std::cerr << "Readed data:\n"
+		<< "Method: " << req.getHttpMethod() << std::endl
+		<< "url: " << req.getUrl() << std::endl;
+		ft::response::AResponse* resp = ft::response::accept(req);
+		buf = resp->getRespone();
+		std::cerr << buf.getFullData() << std::endl;
+		delete resp;
 		service_->addEvent(*this, EVFILT_WRITE);
 	}
 
@@ -90,6 +98,11 @@ void		ft::Socket::asyncWrite(ft::Buffer& buf)
 	int n = send(*this, chunk->chunk, chunk->length, 0);
 	// !if (n < 0)
 	//!	return event::ERROR;
+	if (!buf.headerSended())
+	{
+		buf.setHeaderSended(true);
+		n = BUFSIZE;
+	}
 	if (n == BUFSIZE)
 	{
 		buf.eraseChunk();

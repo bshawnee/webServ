@@ -4,16 +4,13 @@
 # include "Get.hpp"
 # define AVAILABLE_METHOD_COUNT 4
 
-
-	ft::Buffer	handle(ft::Buffer& b);
-
 namespace ft
 {
-struct Response
+namespace response
 {
 	typedef ft::response::AResponse* (*methodFunc)(HttpRequest& req);
-	static ft::response::AResponse*		accept(HttpRequest& req);
-	static const std::string	availableMethod[AVAILABLE_METHOD_COUNT];
+
+	ft::response::AResponse*	accept(HttpRequest& req);
 };
 
 };

@@ -8,8 +8,10 @@ namespace response
 {
 class Get : public AResponse
 {
+public:
+	Get(const Get& ref);
+	Get(HttpRequest& req);
 	ft::Buffer	getRespone();
-	~Get();
 };
 
 };

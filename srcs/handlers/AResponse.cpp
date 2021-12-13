@@ -1,4 +1,5 @@
 #include "../../includes/handlers/AResponse.hpp"
+# include <iostream>
 
 ft::response::AResponse::AResponse(HttpRequest& req) : req_(req) {}
 
@@ -6,6 +7,8 @@ ft::response::AResponse::AResponse(const ft::response::AResponse& req) : req_(re
 {
 	*this = req;
 }
+
+ft::response::AResponse::~AResponse() {}
 
 ft::response::AResponse&	ft::response::AResponse::operator=(const ft::response::AResponse& rhs)
 {
@@ -17,15 +20,20 @@ ft::response::AResponse&	ft::response::AResponse::operator=(const ft::response::
 
 ft::Buffer	ft::response::AResponse::readFromFile_(const std::string& url)
 {
-	std::ifstream file(url);
+	url.c_str();
+	std::ifstream file("index.html");
 	if (!file.is_open())
 		return readFromFile_("error404.html");
 	ft::Buffer buf;
+	int lenH = strlen("200 OK\n");
+	char* header = new char [lenH];
+	strcpy(header, "200 OK\n");
+	buf.addHeader(header, lenH);
 	while (!file.eof())
 	{
 		char* tmp = new char [BUFSIZE];
 		file.read(tmp, BUFSIZE);
-		buf.addData(tmp, BUFSIZE);
+		buf.addData(tmp, file.gcount());
 	}
 	return buf;
 }

@@ -1,7 +1,5 @@
 #include "../../includes/server/Server.hpp"
 
-static const std::string page = "";
-
 ft::Server::Server() {}
 
 ft::Server::~Server()

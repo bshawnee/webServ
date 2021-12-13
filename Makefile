@@ -9,6 +9,9 @@ SRC =	$(SERV_PREF)Socket.cpp \
 		$(SERV_PREF)Buffer.cpp \
 		srcs/utils.cpp \
 		$(HAND_PREF)HttpRequest.cpp \
+		$(HAND_PREF)AResponse.cpp \
+		$(HAND_PREF)Get.cpp \
+		$(HAND_PREF)ResponseFactory.cpp \
 		$(SERV_PREF)Acceptor.cpp
 HEADERS =	includes/server/Socket.hpp \
 			includes/server/Buffer.hpp \
