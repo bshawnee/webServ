@@ -3,6 +3,7 @@
 # include "../server/Buffer.hpp"
 # include "HttpRequest.hpp"
 # include <fstream>
+# include <sstream>
 namespace ft
 {
 namespace response

@@ -25,16 +25,26 @@ ft::Buffer	ft::response::AResponse::readFromFile_(const std::string& url)
 	if (!file.is_open())
 		return readFromFile_("error404.html");
 	ft::Buffer buf;
-	int lenH = strlen("200 OK\n");
-	char* header = new char [lenH];
-	strcpy(header, "200 OK\n");
-	buf.addHeader(header, lenH);
+	int lenBody = 0;
 	while (!file.eof())
 	{
 		char* tmp = new char [BUFSIZE];
 		file.read(tmp, BUFSIZE);
+		lenBody += file.gcount();
 		buf.addData(tmp, file.gcount());
 	}
+	std::stringstream lenBodyToHeader;
+	lenBodyToHeader << lenBody;
+	std::string strLen;
+	lenBodyToHeader >> strLen;
+	std::string header = "HTTP/1.1 200 OK\n" +
+	std::string("Server: WebServer\n") +
+	"Content-Type: text/html\n" +
+	"Content-Length: " + strLen + "\n"
+	"Connection-Close: close\n\n";
+	char* tmp = new char[header.size()];
+	strcpy(tmp, header.c_str());
+	buf.addHeader(tmp, header.length());
 	return buf;
 }
 

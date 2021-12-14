@@ -14,7 +14,12 @@ ft::Acceptor::~Acceptor() {}
 
 void			ft::Acceptor::acceptConnection()
 {
-	std::vector<int> hostsIo(hosts_.begin(), hosts_.end());
+	std::vector<int> hostsIo;
+	for (std::vector<ft::Socket>::iterator it = hosts_.begin();
+	it != hosts_.end(); it++)
+	{
+		hostsIo.push_back(*it);
+	}
 	ft::IOService::Event eventTrigger = io_->getEvent(hostsIo);
 	std::cerr << ft::IOService::eventMsg[static_cast<int>(eventTrigger.second)] << std::endl;
 	if (eventTrigger.second == ft::IOService::CLOSE_CONNECTION)
