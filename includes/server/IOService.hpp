@@ -5,6 +5,7 @@
 # include <string>
 # include <vector>
 # include <utility>
+# include <errno.h>
 
 # define TRIGGERED_EVENT 32
 

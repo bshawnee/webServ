@@ -25,7 +25,8 @@ ft::Socket::Socket(int fd, IOService* io) : service_(io)
 
 ft::Socket::~Socket() {}
 
-
+ft::Socket::FailOnSocket::FailOnSocket(const std::string& errorMsg) :
+	std::invalid_argument(errorMsg + ": \"" + strerror(errno) + "\"") {}
 
 ft::Socket::Socket(const t_adrress& adr, ft::IOService* io) : service_(io)
 {
@@ -83,8 +84,8 @@ void		ft::Socket::asyncRead(ft::Buffer& buf)
 		<< "Method: " << req.getHttpMethod() << std::endl
 		<< "url: " << req.getUrl() << std::endl;
 		ft::response::AResponse* resp = ft::response::accept(req);
-		buf = resp->getRespone();
-		// std::cerr << buf.getFullData() << std::endl;
+		buf = resp->getResponse();
+//		std::cerr << buf.getFullData() << std::endl;
 		delete resp;
 		service_->addEvent(*this, EVFILT_WRITE);
 	}

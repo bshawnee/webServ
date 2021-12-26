@@ -35,6 +35,7 @@ void					HttpRequest::setRequest(std::string const& message) {
 		tmp2.second = tmp[1];
 		this->_clientHeaders.push_back(tmp2);
 	}
+	this->_body = ""; // fix me later
 }
 
 std::string const&		HttpRequest::getHttpMethod() const {
@@ -51,6 +52,10 @@ std::string const&		HttpRequest::getProtocol() const {
 
 headers_t const&		HttpRequest::getClientHeaders() const {
 	return this->_clientHeaders;
+}
+
+const std::string &HttpRequest::getBody() const {
+	return this->_body;
 }
 
 HttpRequest&			HttpRequest::operator=(HttpRequest const& ref) {

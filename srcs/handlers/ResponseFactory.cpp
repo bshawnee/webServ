@@ -43,7 +43,7 @@ ft::Buffer	handle(ft::Buffer& b)
 {
 	HttpRequest req(b.getFullData());
 	ft::response::AResponse* res = ft::response::accept(req);
-	ft::Buffer buf = res->getRespone();
+	ft::Buffer buf = res->getResponse();
 	delete res;
 	return buf;
 }

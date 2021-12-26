@@ -1,9 +1,10 @@
 #ifndef ARESPONSE_HPP
 # define ARESPONSE_HPP
 # include "../server/Buffer.hpp"
+# include "../utils.h"
 # include "HttpRequest.hpp"
 # include <fstream>
-# include <sstream>
+
 namespace ft
 {
 namespace response
@@ -14,7 +15,7 @@ public:
 	AResponse(const AResponse& ref);
 	AResponse(HttpRequest& req);
 
-	virtual ft::Buffer	getRespone() = 0;
+	virtual ft::Buffer	getResponse() = 0;
 
 	AResponse&		operator=(const AResponse& rhs);
 
@@ -26,18 +27,8 @@ public:
 		FailedResponse(const std::string& errorMsg);
 	};
 protected:
-	struct responseHeader {
-		int				statusCode;
-		size_t			contentLength;
-		bool			ok;
-		std::string		contentType;
-		bool			keepConnect;
-	};
-	typedef int status_t;
-	typedef size_t content_t;
-	typedef std::string contentType;
 	ft::Buffer		readFromFile_(const std::string& url);
-	char*			getHttpHeader_(struct responseHeader header);
+	void			addHeader(ft::Buffer& buffer);
 	HttpRequest&	req_;
 };
 

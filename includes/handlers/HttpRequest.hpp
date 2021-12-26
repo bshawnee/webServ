@@ -11,6 +11,9 @@ private:
 	std::string		_url;
 	headers_t		_clientHeaders;
 	std::string		_protocol;
+
+	std::string		_body;
+
 public:
 	HttpRequest();
 	HttpRequest(std::string const& message);
@@ -26,6 +29,17 @@ public:
 	std::string const&		getUrl() const;
 	std::string	const&		getProtocol() const;
 	headers_t const&		getClientHeaders() const;
+	//add some getters:
+	//getParameters
+	std::string const& 		getBody() const; //need fix
+	//getOriginalUri // for PATH_INFO //maybe уже есть
+	// getHost // in header
+
+
+	//add server
+
+
+	//Add Header
 };
 
 #endif

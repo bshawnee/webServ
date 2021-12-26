@@ -41,21 +41,14 @@ std::vector<std::string>	split(std::string const& str, std::string const& delemi
 		vec.push_back(str.substr(firstPos, lastPos));
 	return vec;
 }
-namespace parseHtml
-{
-	std::string		getBlockHtml(const std::string& html, const std::string& block) {
-		std::string endBlock = "</";
 
-		endBlock += &block[1];
-		size_t first = html.find(block);
-		if (first == std::string::npos)
-			return "";
-		first += block.size();
-		size_t end = html.find(endBlock, first);
-		if (end == std::string::npos)
-			return "";
-		return html.substr(first, end - first);
-	}
+std::string	intToString(const int num)
+{
+	std::stringstream containedStream;
+	containedStream << num;
+	std::string str;
+	containedStream >> str;
+	return str;
 }
 
 }
