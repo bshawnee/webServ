@@ -12,6 +12,6 @@ namespace utils
 std::vector<std::string>	split(std::string const& str, std::string const& delemiter);
 std::vector<std::string>	split(std::string const& str, std::string const& delemiter, size_t limit);
 
-}
+};
 
 #endif

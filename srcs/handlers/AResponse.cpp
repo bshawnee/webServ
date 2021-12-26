@@ -20,12 +20,14 @@ ft::response::AResponse&	ft::response::AResponse::operator=(const ft::response::
 
 ft::Buffer	ft::response::AResponse::readFromFile_(const std::string& url)
 {
-	url.c_str();
-	std::ifstream file("index.html");
+	std::string htmlPath = "." + url;
+	if (htmlPath == "./")
+		htmlPath = "/index.html";
+	std::ifstream file(htmlPath);
 	if (!file.is_open())
-		return readFromFile_("error404.html");
+		return readFromFile_("/404.html");
 	ft::Buffer buf;
-	int lenBody = 0;
+	size_t lenBody = 0;
 	while (!file.eof())
 	{
 		char* tmp = new char [BUFSIZE];
@@ -33,20 +35,43 @@ ft::Buffer	ft::response::AResponse::readFromFile_(const std::string& url)
 		lenBody += file.gcount();
 		buf.addData(tmp, file.gcount());
 	}
-	std::stringstream lenBodyToHeader;
-	lenBodyToHeader << lenBody;
-	std::string strLen;
-	lenBodyToHeader >> strLen;
-	std::string header = "HTTP/1.1 200 OK\n" +
-	std::string("Server: WebServer\n") +
-	"Content-Type: text/html\n" +
-	"Content-Length: " + strLen + "\n"
-	"Connection-Close: close\n\n";
-	char* tmp = new char[header.size()];
-	strcpy(tmp, header.c_str());
-	buf.addHeader(tmp, header.length());
+	responseHeader t = {
+		.statusCode = 200,
+		.contentLength = lenBody,
+		.ok = true,
+		.keepConnect = false,
+		.contentType = "text/" + std::string(&url[url.rfind('.') + 1])
+	};
+	std::cerr << "========" << &url[url.rfind('.')] << std::endl;
+	if (url.rfind(".css") != std::string::npos)
+		t.contentType = "text/css";
+	else if (url.rfind(".js") != std::string::npos)
+		t.contentType = "test/js";
+	char* headHttp = getHttpHeader_(t);
+	buf.addHeader(headHttp, strlen(headHttp));
+	file.close();
 	return buf;
 }
 
+char*			ft::response::AResponse::getHttpHeader_(struct responseHeader header)
+{
+	std::stringstream headerStream;
+	headerStream << "HTTP/1.1 " << header.statusCode << " ";
+	if (header.ok)
+		headerStream << "OK\n";
+	else
+		headerStream << "KO\n";
+	headerStream << "Content-Type: " << header.contentType << "\n"
+	<< "Content-Length: " << header.contentLength << "\n";
+	headerStream << "Connection-Close: ";
+	if (header.keepConnect)
+		headerStream << "keep-alive\n\n";
+	else
+		headerStream << "close\n\n";
+	std::string tmp = headerStream.str();
+	char* buf = new char[tmp.length()];
+	strcpy(buf, tmp.c_str());
+	return buf;
+}
 ft::response::AResponse::FailedResponse::FailedResponse(const std::string& errorMsg) :
  std::invalid_argument(errorMsg) {}

@@ -12,7 +12,7 @@ ft::Buffer::Buffer(const ft::Buffer& ref) : headerSended_(false)
 {
 	*this = ref;
 }
-
+#include <iostream>
 ft::Buffer&	ft::Buffer::operator=(const ft::Buffer& rhs)
 {
 	if (this == &rhs)
@@ -20,9 +20,10 @@ ft::Buffer&	ft::Buffer::operator=(const ft::Buffer& rhs)
 	this->clearBuffer();
 	for (std::list<t_buff>::const_iterator it = rhs._data.begin(); it != rhs._data.end(); it++)
 	{
-		char* tmp = new char [BUFSIZE];
-		strcpy(tmp, it->chunk);
-		t_buff t = {.chunk = tmp, .length = it->length};
+		t_buff t;
+		t.chunk = new char [BUFSIZE];
+		t.length = it->length;
+		strcpy(t.chunk, it->chunk);
 		this->_data.push_back(t);
 	}
 	return *this;
@@ -77,4 +78,16 @@ std::string		ft::Buffer::getFullData() {
 		data += it->chunk;
 	}
 	return data;
+}
+
+ft::Buffer::t_links	ft::Buffer::findRefs() const
+{
+	t_links links;
+	std::pair<const char*, const char*> block;
+	for (std::list<t_buff>::const_iterator it = _data.begin();
+	it != _data.end(); it++)
+	{
+		// std::pair<const char*, const char*> headBlock = utils::parseHtml::getBlockHtml(it->chunk, "<head>");
+	}
+	return links;
 }
