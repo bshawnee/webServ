@@ -20,34 +20,34 @@ ft::response::AResponse&	ft::response::AResponse::operator=(const ft::response::
 
 ft::Buffer	ft::response::AResponse::readFromFile_(const std::string& url)
 {
-	url.c_str();
-	std::ifstream file("docs/html/index.html");
-	if (!file.is_open())
-		return readFromFile_("error404.html");
-	ft::Buffer buf;
-	int lenBody_ = 0; // may be delete?
-	while (!file.eof())
-	{
-		char* tmp = new char [BUFSIZE];
-		file.read(tmp, BUFSIZE);
-		lenBody_ += file.gcount();
-		buf.addData(tmp, file.gcount());
+	std::string realPathToFile;
+	if (url == "/")
+		realPathToFile = "index.html";
+	else {
+		realPathToFile = &url[1];
 	}
+	std::ifstream file(realPathToFile);
+	if (!file.is_open()) {
+		return readFromFile_("/404.html");
+	}
+	ft::Buffer buf;
+	std::string tmp;
+	while (getline(file, tmp))
+		buf.addData(tmp);
+	// fileType_ = realPathToFile.substr(realPathToFile.rfind('.') + 1);
 	return buf;
 }
 
 void ft::response::AResponse::addHeader(ft::Buffer &buffer)
 {
-	std::string strLen = utils::intToString(buffer.getFullData().length());
-//	std::string strLen = utils::intToString(264);
+	std::string strLen = utils::intToString(buffer.getData().length());
+	std::string cType = req_.getUrl().substr(req_.getUrl().rfind(".") + 1);
 	std::string header = "HTTP/1.1 200 OK\n" +
 						 std::string("Server: WebServer\n") +
-						 "Content-Type: text/html\n" +
+						 "Content-Type: text/html"  + "\n" +
 						 "Content-Length: " + strLen + "\n"
 													   "Connection-Close: close\n\n";
-	char* tmp = new char[header.size()];
-	strcpy(tmp, header.c_str());
-	buffer.addHeader(tmp, header.length());
+	buffer.addHeader(header);
 }
 
 ft::response::AResponse::FailedResponse::FailedResponse(const std::string& errorMsg) :

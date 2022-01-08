@@ -27,7 +27,7 @@ HEADERS =	includes/server/Socket.hpp \
 			includes/cgi/Cgi.hpp
 OBJ = $(SRC:.cpp=.o)
 LDFLAGS =
-FLAGS = -c -Wall -Wextra -Werror -std=c++98 -g
+FLAGS = -c -Wall -Wextra  -std=c++98 -g
 
 all: $(SRC) $(NAME)
 

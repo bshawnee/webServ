@@ -30,7 +30,7 @@ ft::Buffer ft::response::Cgi::run(const ft::Buffer &pageBeforeCgi)
 	ft::Buffer responsePage = pageBeforeCgi;
 	// иногда приходит странный буфер
 	std::cout << "---------------\n";
-	std::cout << responsePage.getFullData() << std::endl;
+	std::cout << responsePage.getData() << std::endl;
 	std::cout << "---------------\n";
 	int fdRequest[2];
 	int fdResponse[2];
@@ -52,7 +52,7 @@ ft::Buffer ft::response::Cgi::run(const ft::Buffer &pageBeforeCgi)
 		throw std::exception(); // exception??
 	else if (pid == 0)
 	{
-		const std::string page = responsePage.getFullData();
+		const std::string page = responsePage.getData();
 		write(fdRequest[1], page.c_str(), page.length());
 		dup2(fdRequest[0], 0);
 		dup2(fdResponse[1], 1);
@@ -90,8 +90,7 @@ ft::Buffer ft::response::Cgi::run(const ft::Buffer &pageBeforeCgi)
 	//add date
 
 
-	responsePage.clearBuffer();
-	responsePage.addData(strdup(toBuffer.c_str()), toBuffer.length());
+	responsePage.addData(toBuffer);
 
 
 //	std::cout << responsePage.getFullData();

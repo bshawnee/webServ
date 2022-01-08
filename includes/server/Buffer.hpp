@@ -8,31 +8,44 @@ namespace ft
 
 class Buffer {
 public:
-	typedef struct s_buff {
-		char	*chunk;
-		size_t	length;
-	}			t_buff;
-	Buffer();
-	Buffer(const ft::Buffer& ref);
-	~Buffer();
+    Buffer() {}
+    Buffer(const Buffer& ref) { *this = ref; }
+    ~Buffer() {}
 
-	operator bool();
-	ft::Buffer&		operator=(const ft::Buffer& rhs);
-	std::string		getFullData();
-	void			addData(char *bytes, int length);
-	void			addHeader(char *bytes, int length);
-	bool			headerSended() const;
-	void			setHeaderSended(bool status) { headerSended_ = status ; }
-	t_buff*			getData();
-	void			eraseChunk();
-	void			clearBuffer();
+    operator bool() { return !(_data.empty()); }
+    Buffer& operator=(const Buffer& rhs) {
+        if (this == &rhs)
+            return *this;
+        _data = rhs._data;
+        return *this;
+    }
+
+    std::string getData(int64_t size = -1) {
+        if (size == -1)
+            return _data;
+        if (_data.length() > static_cast<size_t>(size)) {
+            std::string tmp = _data.substr(0, size);
+            _data = &_data[size];
+            return tmp;
+        }
+        std::string tmp;
+        tmp = _data;
+        _data.clear();
+        return tmp;
+    }
+
+    void addData(const std::string& data) {
+        _data += data;
+    }
+    void addHeader(const std::string& header) {
+        std::string tmp = header;
+        tmp += _data;
+        _data = tmp;
+    }
 
 private:
-	std::list<t_buff>	_data;
-	bool				headerSended_;
+    std::string _data;
 };
-
-typedef ft::Buffer (*Handler)(ft::Buffer&);
 
 };
 

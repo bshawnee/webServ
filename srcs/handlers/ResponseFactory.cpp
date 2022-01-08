@@ -36,12 +36,12 @@ ft::response::AResponse*	ft::response::accept(HttpRequest& req)
 	for (i = 0; i < AVAILABLE_METHOD_COUNT; i++)
 		if (!g_availableMethod[i].compare(req.getHttpMethod()))
 			break ;
-	return func[i](req);
+	return (func[i])(req);
 }
 
 ft::Buffer	handle(ft::Buffer& b)
 {
-	HttpRequest req(b.getFullData());
+	HttpRequest req(b.getData());
 	ft::response::AResponse* res = ft::response::accept(req);
 	ft::Buffer buf = res->getResponse();
 	delete res;

@@ -71,16 +71,17 @@ ft::Socket::operator int()
 
 void		ft::Socket::asyncRead(ft::Buffer& buf)
 {
-	char* tmp = new char [BUFSIZE];
+	char tmp[BUFSIZE + 1];
 	std::cerr << "Socket fd : " << *this << std::endl;
 	int n = recv(*this, tmp, BUFSIZE, 0);
 	// ! if (n < 0)
 	// ! return event::Error;
-	buf.addData(tmp, n);
+	tmp[n + 1] = '\0';
+	buf.addData(std::string(tmp));
 	if (n < BUFSIZE)
 	{
-		HttpRequest req(buf.getFullData());
-		std::cerr << "Readed data:\n"
+		HttpRequest req(buf.getData());
+		std::cerr << "Readed data: " << buf.getData() << "\n"
 		<< "Method: " << req.getHttpMethod() << std::endl
 		<< "url: " << req.getUrl() << std::endl;
 		ft::response::AResponse* resp = ft::response::accept(req);
@@ -94,23 +95,16 @@ void		ft::Socket::asyncRead(ft::Buffer& buf)
 
 void		ft::Socket::asyncWrite(ft::Buffer& buf)
 {
-	ft::Buffer::t_buff* chunk = buf.getData();
-	int n = send(*this, chunk->chunk, chunk->length, 0);
+	std::cerr << "=========" << std::endl
+	<< buf.getData() << std::endl
+	<< "============" << std::endl;
+	std::string chunk = buf.getData(BUFSIZE);
+	send(*this, chunk.c_str(), chunk.length(), 0);
 	// !if (n < 0)
 	//!	return event::ERROR;
-	if (!buf.headerSended())
+	if (buf)
 	{
-		buf.setHeaderSended(true);
-		n = BUFSIZE;
-	}
-	if (n == BUFSIZE)
-	{
-		buf.eraseChunk();
 		service_->addEvent(*this, EVFILT_WRITE);
-	}
-	else
-	{
-		buf.clearBuffer();
 	}
 }
 

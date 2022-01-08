@@ -29,6 +29,7 @@ public:
 protected:
 	ft::Buffer		readFromFile_(const std::string& url);
 	void			addHeader(ft::Buffer& buffer);
+	std::string		fileType_;
 	HttpRequest&	req_;
 };
 
