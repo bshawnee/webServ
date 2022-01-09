@@ -4,6 +4,7 @@
 # include "../utils.h"
 # include "HttpRequest.hpp"
 # include <fstream>
+# include "ResponseHeader.hpp"
 
 namespace ft
 {
@@ -31,6 +32,7 @@ protected:
 	void			addHeader(ft::Buffer& buffer);
 	std::string		fileType_;
 	HttpRequest&	req_;
+	ResponseHeader	respHeader_;
 };
 
 };

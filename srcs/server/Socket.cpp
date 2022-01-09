@@ -95,9 +95,9 @@ void		ft::Socket::asyncRead(ft::Buffer& buf)
 
 void		ft::Socket::asyncWrite(ft::Buffer& buf)
 {
-	std::cerr << "=========" << std::endl
-	<< buf.getData() << std::endl
-	<< "============" << std::endl;
+	// std::cerr << "=========" << std::endl
+	// << buf.getData() << std::endl
+	// << "============" << std::endl;
 	std::string chunk = buf.getData(BUFSIZE);
 	send(*this, chunk.c_str(), chunk.length(), 0);
 	// !if (n < 0)

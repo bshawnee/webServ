@@ -22,6 +22,9 @@ void					HttpRequest::setRequest(std::string const& message) {
 	parts = utils::split(message, NEWLINE);
 	head = parts[0];
 	heads = utils::split(head, " ");
+	for (size_t i = 0; i < parts.size(); i++) {
+		std::cerr << "!-!" << parts[i] << "!+!" << std::endl;
+	}
 	// if (heads.size() < 2)
 	// 	std::cerr << "Invalid request" << std::endl;
 	this->_httpMethod = heads[0];
@@ -33,6 +36,7 @@ void					HttpRequest::setRequest(std::string const& message) {
 		std::pair<std::string, std::string> tmp2;
 		tmp2.first = tmp[0];
 		tmp2.second = tmp[1];
+		std::cerr << "first: " << tmp2.first << "second: " << tmp2.second << std::endl;
 		this->_clientHeaders.push_back(tmp2);
 	}
 	this->_body = ""; // fix me later

@@ -3,20 +3,14 @@
 # define DELIMITER			"\r\n\r\n"
 # define NEWLINE			"\r\n"
 # define HEADER_DELIMITER	":"
+# include <map>
 # include "../utils.h"
 
 class HttpRequest {
-private:
-	std::string		_httpMethod;
-	std::string		_url;
-	headers_t		_clientHeaders;
-	std::string		_protocol;
-
-	std::string		_body;
-
 public:
-	HttpRequest();
+
 	HttpRequest(std::string const& message);
+	HttpRequest();
 	HttpRequest(HttpRequest const& ref);
 	~HttpRequest();
 
@@ -37,8 +31,13 @@ public:
 
 
 	//add server
+private:
+	std::string		_httpMethod;
+	std::string		_url;
+	headers_t		_clientHeaders;
+	std::string		_protocol;
 
-
+	std::string		_body;
 	//Add Header
 };
 

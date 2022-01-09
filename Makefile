@@ -13,10 +13,12 @@ SRC =	$(SERV_PREF)Socket.cpp \
 		$(HAND_PREF)AResponse.cpp \
 		$(HAND_PREF)Get.cpp \
 		$(HAND_PREF)Post.cpp \
+		$(HAND_PREF)ResponseHeader.cpp \
 		$(HAND_PREF)ResponseFactory.cpp \
 		$(SERV_PREF)Acceptor.cpp \
 		$(CGI_PREF)Cgi.cpp
 HEADERS =	includes/server/Socket.hpp \
+			includes/handlers/ResponseHeader.hpp \
 			includes/server/Buffer.hpp \
 			includes/server/Server.hpp \
 			includes/handlers/HttpRequest.hpp \

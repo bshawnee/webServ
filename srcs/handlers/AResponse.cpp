@@ -40,13 +40,16 @@ ft::Buffer	ft::response::AResponse::readFromFile_(const std::string& url)
 
 void ft::response::AResponse::addHeader(ft::Buffer &buffer)
 {
+	const headers_t& cHeaders = req_.getClientHeaders();
+	std::string acceptType;
+	std::vector<std::string> splited = utils::split(acceptType, ",");
 	std::string strLen = utils::intToString(buffer.getData().length());
 	std::string cType = req_.getUrl().substr(req_.getUrl().rfind(".") + 1);
-	std::string header = "HTTP/1.1 200 OK\n" +
-						 std::string("Server: WebServer\n") +
-						 "Content-Type: text/html"  + "\n" +
-						 "Content-Length: " + strLen + "\n"
-													   "Connection-Close: close\n\n";
+	std::string header = "HTTP/1.1 200 OK\nServer: WebServer\n";
+	header += "Content-Length: " + strLen + "\n";
+	header += "Connection-Close: close\n\n";
+	std::cerr << "---+\n"<< header<< "+---\n" << std::endl;
+
 	buffer.addHeader(header);
 }
 
